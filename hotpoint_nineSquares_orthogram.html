@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>热点分布</title>
+</head>
+<style>
+    * {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    #box {
+        height: 99%;
+        position: relative;
+        width: 99%;
+        text-align: center;
+        border: 2px solid black;
+    }
+
+    #box canvas {
+        /* canvas标签的宽高必须在标签里就设定好，在样式里设置会对其进行拉伸 */
+        /* 画布背景设置为透明 */
+        background: rgba(255, 255, 255, 0);
+        position: absolute;
+        /* 确保在遮盖的颜色上方 */
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    /* #box img {
+        /* position: absolute; */
+        /* width: 1003;
+        height: 850; */
+    /* }  */
+</style>
+
+<body onload="alert('请点击热点打开全景')">
+    <div id="box">
+        <canvas id="myCanvas" width="1003" height="850">
+            您的浏览器不支持html画布！
+        </canvas>
+        <img width="1003" height="850" src="orthogram.jpg" usemap="#hotpoint_map" alt="orthogram图片丢失" />
+    </div>
+    <map id="hotpoint_map" name="hotpoint_map">
+        <area id="parking1" shape="circle" href="undergourd_parking1.html" title="parking1" target="_blank"
+            alt="undergourd_parking1" />
+
+        <area id="parking2" shape="circle" href="undergourd_parking2.html" title="parking2" target="_blank"
+            alt="undergourd_parking2" />
+    </map>
+    <script>
+        // 热点区域大小初始化为10px;
+        var hot_area_size = 15;
+        // 定义一个函数，输入目标像素点在原始图片中的坐标，输出目标像素点在网页图片中的高度
+        function computedCoords(x_origin, y_origin) {
+            // 图片的原始尺寸是10827*9170，在网页中高度被设定为850，并且锁定宽高比
+            // 根据高度被压缩的比率，算出目标像素点在网页图片中的高度
+            let y_real = y_origin * 850 / 9170;
+            // 根据高度被压缩的比率，算出目标像素点在网页图片中的宽度
+            let x_real = x_origin * 850 / 9170;
+            // 将计算出来的坐标赋给热点图相应区域的coords属性
+            return [x_real, y_real];
+        }
+
+        function setAreaCoords(x_origin, y_origin, area_id) {
+            let coords_real = computedCoords(x_origin, y_origin);
+            // 将计算出来的坐标赋给热点图相应区域的coords属性
+            document.getElementById(area_id).coords = `${coords_real[0]}, ${coords_real[1]}, ${hot_area_size}`;
+        }
+
+        function drawHotAreaPath(x_origin, y_origin, cxt) {
+            let y_real = y_origin * 850 / 9170;
+            let x_real = x_origin * 850 / 9170;
+            cxt.arc(x_real, y_real, hot_area_size, 0, Math.PI * 2, true);
+        }
+        // 设定地下停车场1的在热点图中的坐标
+        setAreaCoords(1886, 4007, "parking1");
+        // // 设定地下停车场2的在热点图中的坐标
+        setAreaCoords(2851, 3595, "parking2");
+
+        // 在图像上覆盖一个透明背景的画布，并在热点区域绘制圆形标识
+        var c = document.getElementById("myCanvas");
+        var cxt = c.getContext("2d");
+        cxt.fillStyle = "#FF0000";
+        cxt.beginPath();
+        // 绘制地下停车场1的热点区域路径
+        drawHotAreaPath(1886, 4007, cxt)
+        // 绘制地下停车场2的热点区域路径
+        drawHotAreaPath(2851, 3595, cxt)
+        cxt.closePath();
+        cxt.fill();
+
+    </script>
+</body>
+
+</html>
