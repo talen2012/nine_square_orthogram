@@ -6,7 +6,7 @@
     <title>Document</title>
     <style type="text/css">
         canvas {
-            width: 1003;
+            width: auto;
             height: 850;
             border: 1px solid #c3c3c3;
         }
@@ -21,18 +21,37 @@
 
     var c = document.getElementById("myCanvas");
     var cxt = c.getContext("2d");
-    cxt.fillStyle = "#FF0000";
-    cxt.beginPath();
-    cxt.arc(0, 0, 19, 0, Math.PI * 2, true);
+    var img = new Image();
+    img.src = "orthogram.jpg";
+    // 图片加载完成后在画布上绘制图形
+    img.onload = function()
+    {
+        cxt.drawImage(img, 0, 0, 1003.593, 850);
+    }
 
-    cxt.closePath();
-    cxt.fill();
+    // 绘制热点区域的函数
 
-    cxt.beginPath();
+    function drawArea(cxt)
+    {
+        cxt.fillStyle = "#FF0000";
+        cxt.beginPath();
+        cxt.arc(0, 0, 19, 0, Math.PI * 2, true);
 
-    cxt.arc(100, 18, 15, 0, Math.PI * 2, true);
-    cxt.closePath();
-    cxt.fill();
+        cxt.closePath();
+        cxt.fill();
+
+        cxt.beginPath();
+
+        cxt.arc(100, 18, 15, 0, Math.PI * 2, true);
+        cxt.closePath();
+        cxt.fill();
+    }
+    // 由于图片加载需要时间，直接drawArea会导致先绘制热点，后绘制图形，图形遮盖住热点
+    // 定时器异步实现
+    setTimeout("drawArea(cxt)", 1000);
+    // drawArea(cxt);
+
+
 </script>
 </body>
 </html>
